@@ -14,11 +14,13 @@ export class UserEntity {
   id: string;
 
   @Column()
+  // unique해야하는거 추가하기
   userId: string;
 
   @OneToMany(() => Post, (post) => post.user)
   posts: Post[];
 
+  // unique해야하는거 추가하기
   @Column({ length: 60 })
   email: string;
 

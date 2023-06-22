@@ -1,26 +1,29 @@
-import { Injectable } from '@nestjs/common';
-import { CreateAuthDto } from './dto/create-auth.dto';
-import { UpdateAuthDto } from './dto/signup.dto';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { SignupDto } from './dto/signup.dto';
+import { UsersService } from 'src/users/users.service';
+import { LoginDto } from './dto/login.dto';
+import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
 export class AuthService {
-  create(createAuthDto: CreateAuthDto) {
-    return 'This action adds a new auth';
+  constructor(
+    private readonly usersService: UsersService,
+    private readonly jwtService: JwtService,
+  ) {}
+
+  async signup(signUpDto: SignupDto) {
+    return await this.usersService.create(signUpDto);
   }
 
-  findAll() {
-    return `This action returns all auth`;
-  }
-
-  findOne(id: number) {
-    return `This action returns a #${id} auth`;
-  }
-
-  update(id: number, updateAuthDto: UpdateAuthDto) {
-    return `This action updates a #${id} auth`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} auth`;
+  async login(loginDto: LoginDto) {
+    const user = await this.usersService.findOneById(loginDto.id);
+    if (loginDto.password !== user.password) {
+      throw new UnauthorizedException(
+        '비밀번호를 잘못입력하셨습니다. 다시 입력해주세요.',
+      );
+    }
+    return this.jwtService.sign({
+      id: user.id,
+    }); //-> jwt
   }
 }

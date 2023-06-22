@@ -20,21 +20,28 @@ export class UsersService {
     const { email, id, password } = createUserDto;
     const exist = await this.usersRepository.findOneBy({ email: email });
     if (exist) {
-      throw new ConflictException('사용하실 수 없는 아이디입니다');
+      throw new ConflictException('사용하실 수 없는 이메일입니다');
     }
     const user = await this.usersRepository.create({
       email,
       id,
       password,
     });
+    //id 중복 확인하기
     await this.usersRepository.save(user);
     return user;
   }
-  async findOneByEmail(email: string) {
-    const user = await this.usersRepository.findOneBy({ email });
+
+  async findOneById(id: string) {
+    const user = await this.usersRepository.findOneBy({ id });
     if (!user) {
       throw new NotFoundException('User not found');
     }
+    return user;
+  }
+
+  async findOne(id: string) {
+    const user = await this.usersRepository.findOneBy({ id });
     return user;
   }
 }
